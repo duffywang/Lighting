@@ -65,7 +65,10 @@ public class Node implements Comparable{
         if (preState == nodeStatus){
             return false;
         }
-        
+
+        /**
+         * sort by Node weight
+        * */
         Map<Node, Relation> treeMap = new TreeMap<>(postNodeMap);
         for (Map.Entry<Node, Relation> entry : treeMap.entrySet()) {
             Node postNode = entry.getKey();
@@ -78,7 +81,25 @@ public class Node implements Comparable{
         return true;
     }
 
+    /**
+     *
+     * */
     private void markSelf() {
+        for (Map.Entry<Node, Relation> entry : preNodeMap.entrySet()) {
+            Node preNode = entry.getKey();
+            Relation relation = entry.getValue();
+            int curState = preNode.getState().get();
+
+            if (curState == NodeStatusConstant.FAILURE && relation == Relation.INVOKE_SUCCESS){
+                getWork().getWorkContext().getGraph().markNodeFailure(this);
+                break;
+            }
+            if (curState == NodeStatusConstant.FINISHED && relation == Relation.INVOKE_FAILURE){
+                getWork().getWorkContext().getGraph().markNodeFailure(this);
+                break;
+            }
+        }
+
     }
 
     private void tryInvoke() {

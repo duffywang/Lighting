@@ -1,5 +1,7 @@
 package src.main.java.task;
 
+import src.main.java.Graph;
+import src.main.java.Node;
 import src.main.java.WorkContext;
 
 /**
@@ -63,22 +65,34 @@ public abstract class AbstractWork<T> implements Work {
     public abstract void sendRequest();
 
     protected boolean markFinished() {
-
+        Graph graph = getWorkContext().getGraph();
+        Node node = graph.getByName(getWorkName());
+        return graph.markNodeFinished(node);
     }
 
     protected boolean markProcessing() {
-
-    }
-
-    protected boolean markFailure() {
-
+        Graph graph = getWorkContext().getGraph();
+        Node node = graph.getByName(getWorkName());
+        return graph.markNodeProcessing(node);
     }
 
     /**
      *
      * */
+    protected boolean markFailure() {
+        Graph graph = getWorkContext().getGraph();
+        Node node = graph.getByName(getWorkName());
+        return graph.markNodeFailure(node);
+    }
+
+
+    /**
+     * execute or not
+     *  1.business logic eg: version time,etc.
+     *  2.forbidden list
+     * */
     public boolean shouldDo() {
-        return match() && getWorkContext()
+        return match() && !getWorkContext().getForbiddenWorks().contains(getClass().getName());
     }
 
 
